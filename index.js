@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 const cors = require('cors')
 const bodyParser = require('body-parser')
 require('dotenv').config()
@@ -17,6 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
     const CarsCollection = client.db("superCarsShop").collection("cars");
     const OrderedCarsCollection = client.db("superCarsShop").collection("orders");
+
     app.post('/addCar', (req, res) => {
         const newCar = (req.body);
         CarsCollection.insertOne(newCar)
@@ -25,6 +27,20 @@ client.connect(err => {
                 res.send(result.insertedCount > 0)
             })
 
+    })
+
+    app.get('/cars', (req, res) => {
+        CarsCollection.find()
+            .toArray((err, cars) => {
+                res.send(cars)
+            })
+    })
+
+    app.delete('/remove/:id', (req, res) => {
+
+        const id = req.params.id
+        CarsCollection.deleteOne({ _id: ObjectID(id) })
+            .then(documents => res.send(!!documents.value))
     })
 
     app.post('/placeOrder', (req, res) => {
@@ -36,10 +52,13 @@ client.connect(err => {
             })
 
     })
-    app.get('/cars', (req, res) => {
-        CarsCollection.find()
-            .toArray((err, cars) => {
-                res.send(cars)
+
+    app.get('/showOrders', (req, res) => {
+        const userEmail = req.query.email
+        // console.log(userEmail);
+        OrderedCarsCollection.find({ email: userEmail })
+            .toArray((err, orderedCars) => {
+                res.send(orderedCars)
             })
     })
 });
