@@ -37,7 +37,6 @@ client.connect(err => {
     })
 
     app.delete('/remove/:id', (req, res) => {
-
         const id = req.params.id
         CarsCollection.deleteOne({ _id: ObjectID(id) })
             .then(documents => res.send(!!documents.value))
@@ -55,7 +54,6 @@ client.connect(err => {
 
     app.get('/showOrders', (req, res) => {
         const userEmail = req.query.email
-        // console.log(userEmail);
         OrderedCarsCollection.find({ email: userEmail })
             .toArray((err, orderedCars) => {
                 res.send(orderedCars)
@@ -64,7 +62,7 @@ client.connect(err => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello Worlddddddddddd! from herokuuuuuuu')
+    res.send('Hello World! from heroku')
 })
 
 app.listen(port)
